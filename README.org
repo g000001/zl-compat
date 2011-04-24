@@ -4,5 +4,15 @@ Zetalispの機能を再現して遊ぶ
 
 *** defun
    - [X] (:property foo bar) 形式サポート
+#+BEGIN_SRC lisp
+(zl:defun (:property fib fib) (n)
+  (if (< n 2)
+      n
+      (+ (funcall #'(:property fib fib) (1- n))
+         (funcall #'(:property fib fib) (- n 2)))))
+
+(funcall #'(:property fib fib) 10)
+;=> 55
+#+END_SRC
 
 *** car-safe
