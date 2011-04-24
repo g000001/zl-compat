@@ -1,0 +1,8 @@
+* Zetalisp Compatible
+
+Zetalispの機能を再現して遊ぶ
+
+*** defun
+   - [X] (:property foo bar) 形式サポート
+
+*** car-safe
