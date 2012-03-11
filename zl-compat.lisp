@@ -6,7 +6,7 @@
 
 (in-suite tests)
 
-(defmacro zl:defun (name (&rest args) &body body)
+(defmacro defun (name (&rest args) &body body)
   (etypecase name
     ((atom)
      `(cl:defun ,name (,@args) ,@body))
@@ -21,7 +21,7 @@
                    ,@body))))))))
 
 (defun sharp-quote (stream sub-char numarg)
-  (sb-impl::ignore-numarg sub-char numarg)
+  (declare (ignore sub-char numarg))
   ;; The fourth arg tells READ that this is a recursive call.
   (let ((exp (read stream t nil t)))
     (etypecase exp
@@ -64,26 +64,69 @@
 
 ;; car-safe
 
-(declaim (inline zl:car-safe))
-(defun zl:car-safe (form)
-  (if (consp form)
-      (car form)
-      form))
+(declaim (inline
+          car-safe
+          cdr-safe
+          caar-safe
+          cadr-safe
+          cdar-safe
+          cddr-safe
+          caddr-safe
+          cdddr-safe
+          cadddr-safe
+          cddddr-safe
+          nth-safe
+          nthcdr-safe ))
 
-(test zl:car-safe
-  (is (= (zl:car-safe '(1 2 3 4))
+(defun nthcdr-safe (n object)
+  (and (consp object)
+       (nthcdr n object)))
+
+(defun nth-safe (n object)
+  (and (nthcdr-safe n object)
+       (nth n object)))
+
+(declaim (inline car-safe))
+(defun car-safe (object)
+  (nth-safe 0 object))
+
+(defun cdr-safe (object)
+  (nthcdr-safe 1 object))
+
+(defun caar-safe (object)
+  (car-safe (car-safe object)))
+
+(defun cadr-safe (object)
+  (nth-safe 1 object))
+
+(defun cddr-safe (object)
+  (nthcdr-safe 2 object))
+
+(defun caddr-safe (object)
+  (nth-safe 2 object))
+
+(defun cdddr-safe (object)
+  (nthcdr-safe 3 object))
+
+(defun cadddr-safe (object)
+  (nth-safe 3 object))
+
+(defun cddddr-safe (object)
+  (nthcdr-safe 4 object))
+
+(test car-safe
+  (is (= (car-safe '(1 2 3 4))
          1))
-  (is (= (zl:car-safe 1)
-         1)))
+  (is (null (car-safe 1))))
 
 ;; neq
-(declaim (inline zl:neq))
-(defun zl:neq (x y)
+(declaim (inline neq))
+(defun neq (x y)
   (not (eq x y)))
 
-(test zl:neq
-  (is (eq 'T (zl:neq nil 'T)))
-  (is (eq nil (zl:neq 'T 'T))))
+(test neq
+  (is (eq 'T (neq nil 'T)))
+  (is (eq nil (neq 'T 'T))))
 
 ;;; (LET-IF <COND> ((VAR-1 VAL-1) (VAR-2 VAL-2) ... (VAR-N VAL-N)) &BODY BODY)
 ;;; If <COND> is not nil, binds VAR-I to VAL-I (evaluated) during execution of BODY,
@@ -118,8 +161,7 @@ therefore, strictly speaking only variables declared special should be used."
            ,@(remove-decls body)))))|#
 
 
-#|(zl:let-if (probe-file "foo")
+#|(let-if (probe-file "foo")
            ((foo 3) (bar 4))
   (declare (fixnum foo))
   (list foo bar))|#
-
