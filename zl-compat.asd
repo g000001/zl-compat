@@ -6,7 +6,9 @@
   :serial t
   :depends-on (:fiveam)
   :components ((:file "package")
-               (:file "zl-compat")))
+               (:file "variables")
+               (:file "zl-compat")
+               (:file "setup")))
 
 (defmethod perform ((o test-op) (c (eql (find-system :zl-compat))))
   (load-system :zl-compat)
@@ -17,5 +19,3 @@
           (funcall (_ :explain!) result)
           (funcall (_ :results-status) result)))
       (error "test-op failed") ))
-
-
