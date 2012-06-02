@@ -7,6 +7,7 @@
   :depends-on (:fiveam)
   :components ((:file "package")
                (:file "variables")
+               (:file "base")
                (:file "zl-compat")
                (:file "setup")))
 

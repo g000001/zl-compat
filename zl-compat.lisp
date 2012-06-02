@@ -6,36 +6,20 @@
 
 (in-suite tests)
 
-(defmacro defun (name (&rest args) &body body)
-  (etypecase name
-    ((atom)
-     `(cl:defun ,name (,@args) ,@body))
-    ((cons)
-     (ecase (car name)
-       ((:property)
-        (destructuring-bind (ignore symbol property)
-                            name
-          (declare (ignore ignore))
-          `(setf (get ',symbol ',property)
-                 (lambda (,@args)
-                   ,@body))))))))
-
 (defun sharp-quote (stream sub-char numarg)
   (declare (ignore sub-char numarg))
   ;; The fourth arg tells READ that this is a recursive call.
   (let ((exp (read stream t nil t)))
     (etypecase exp
-      ((atom)
-       `(function ,exp))
-      ((cons)
-       (ecase (car exp)
-         ((setf)
-          `(function ,exp))
-         ((:property)
-          (destructuring-bind (ignore symbol property)
-                              exp
-            (declare (ignore ignore))
-            `(get ',symbol ',property))))))))
+      (cl:atom `(function ,exp))
+      (cl:cons (ecase (car exp)
+                 ((setf)
+                  `(function ,exp))
+                 ((:property)
+                  (destructuring-bind (ignore symbol property)
+                      exp
+                    (declare (ignore ignore))
+                    `(get ',symbol ',property))))))))
 
 (test sharp-quote
   (is (equal (with-input-from-string (srm "#'(:property foo bar)")
@@ -52,11 +36,11 @@
              '#'(SETF FOO))))
 
 #+sbcl
-(defun enable-extended-sharp-quote ()
+(cl:defun enable-extended-sharp-quote ()
   (set-dispatch-macro-character #\# #\' #'sharp-quote))
 
 #+sbcl
-(defun disable-extended-sharp-quote ()
+(cl:defun disable-extended-sharp-quote ()
   (set-dispatch-macro-character #\# #\' #'sb-impl::sharp-quote))
 
 ;; once-only
