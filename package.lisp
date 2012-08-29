@@ -29,6 +29,7 @@
    :≤ :≥ :≠ :get-pname :string-length :time-difference :substring
    :nsubstring :substring
    :^
+   :string-pluralize
    ))
 
 (defpackage #:zl-internal
