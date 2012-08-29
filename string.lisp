@@ -4,7 +4,7 @@
 (defun string-pluralize (string)
   "Return a plural form of STRING.
 Attempts to preserve the case-pattern in STRING."
-  (setq string (coerce string 'string))
+  (setq string (cl:string string))
   (if (equal string "")
       ""
     (let* (flush add

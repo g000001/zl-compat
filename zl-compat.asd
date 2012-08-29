@@ -8,6 +8,7 @@
   :components ((:file "package")
                (:file "variables")
                (:file "base")
+               (:file "string")
                (:file "zl-compat")
                (:file "setup")))
 
