@@ -6,6 +6,19 @@
 
 (in-suite tests)
 
+
+(cl:defmacro do1 (var init next test &body body)
+  `(cl:do ((,var ,init ,next))
+        (,test)
+     . ,body))
+
+
+(cl:defmacro do (vars test &body body)
+  (etypecase vars
+    (cons `(cl:do ,vars ,test . ,body))
+    ((and symbol (not null)) `(do1 ,vars ,test . ,body))))
+
+
 (defun sharp-quote (stream sub-char numarg)
   (declare (ignore sub-char numarg))
   ;; The fourth arg tells READ that this is a recursive call.
@@ -534,8 +547,9 @@ Case matters during character comparison if CONSIDER-CASE is non-NIL."
         (read-from-string
          (write-to-string expr) ))))
 
-(defun inhibit-style-warnings (mesg)
-  (warn mesg) )
+(defmacro inhibit-style-warnings (mesg)
+  `(handler-bind ((style-warning #'muffle-warning))
+     (progn ,mesg)))
 
 (DEFUN XR-TABLE-SETUP ()
   (SETQ POWERS-OF-10F0-TABLE (MAKE-ARRAY POWERS-OF-10F0-TABLE-LENGTH
@@ -585,3 +599,4 @@ Case matters during character comparison if CONSIDER-CASE is non-NIL."
        'T ))
 
 (deff ^ #'cl:expt)
+
